@@ -12,19 +12,19 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 # Создание экрана
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen = pygame.display.set_mode((800, 300))
 pygame.display.set_caption("Динозаврик")
 clock = pygame.time.Clock()
 
 dino_img = pygame.image.load("dino.png")
-dino_duck_img = pygame.image.load("dino_duck.png")
+dino_squat_img = pygame.image.load("dino_squat.png")
 cactus_img = pygame.image.load("cactus.png")
 bird_img = pygame.image.load("bird.png")
 
-dino_rect = pygame.Rect(50, GROUND_HEIGHT - 50, 30, 50)
+dino_rect = pygame.Rect(50, 250 - 50, 30, 50)
 dino_velocity_y = 0
 dino_jumping = False
-dino_ducking = False
+dino_squating = False
 
 obstacles = []
 obstacle_timer = 0
@@ -43,44 +43,38 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-for event in pygame.event.get():
-    if event.type == pygame.QUIT:
-        running = False
-    
     # Рестарт игры
-    if game_over:
+        if game_over:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE or event.key == pygame.K_UP:
+                    game_over = False
+                    score = 0
+                    game_speed = 5
+                    obstacles = []
+                    dino_rect.y = GROUND_HEIGHT - 50
+                    dino_velocity_y = 0
+                    dino_jumping = False
+                    dino_squating = False
+        
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE or event.key == pygame.K_UP:
-                game_over = False
-                score = 0
-                game_speed = 5
-                obstacles = []
-                dino_rect.y = GROUND_HEIGHT - 50
-                dino_velocity_y = 0
-                dino_jumping = False
-                dino_ducking = False
-        continue  # Пропускаем остальную обработку, если игра окончена
-    
-    # Прыжок
-    if event.type == pygame.KEYDOWN:
-        if event.key == pygame.K_SPACE or event.key == pygame.K_UP:
-            if dino_jumping == False and dino_ducking == False:
-                dino_velocity_y = -15
-                dino_jumping = True
+                if dino_jumping == False and dino_squating == False:
+                    dino_velocity_y = -15
+                    dino_jumping = True
     
     # Приседание
     if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_DOWN:
             if dino_jumping == False:
-                dino_ducking = True
+                dino_squating = True
                 dino_rect.height = 30
                 dino_rect.y = GROUND_HEIGHT - 30
     
     # Вставание
     if event.type == pygame.KEYUP:
         if event.key == pygame.K_DOWN:
-            if dino_ducking == True:
-                dino_ducking = False
+            if dino_squating == True:
+                dino_squating = False
                 dino_rect.height = 50
                 dino_rect.y = GROUND_HEIGHT - 50
     
@@ -133,8 +127,8 @@ for event in pygame.event.get():
     pygame.draw.line(screen, BLACK, (0, GROUND_HEIGHT), (SCREEN_WIDTH, GROUND_HEIGHT), 2)
     
     # Отрисовка динозаврика
-    if dino_ducking:
-        screen.blit(dino_duck_img, dino_rect)
+    if dino_squating:
+        screen.blit(dino_squat_img, dino_rect)
     else:
         screen.blit(dino_img, dino_rect)
     
